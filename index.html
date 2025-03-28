@@ -4,93 +4,88 @@
   <meta charset="UTF-8">
   <title>Carbon Freeze 3D with OrbitControls</title>
   <style>
-    /* Make canvas fill the browser window */
+    /* Canvas will fill the entire browser window */
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
   </style>
-  <!-- Load Three.js library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r141/three.min.js"></script>
-  <!-- Load non-module OrbitControls from Three.js examples -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r141/examples/js/controls/OrbitControls.js"></script>
-</head>
-<body>
-  <script>
-    // Create a new scene
+  <!-- Load Three.js with defer so that it's executed in order -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r141/three.min.js"></script>
+  <!-- Load OrbitControls (non-module version) -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r141/examples/js/controls/OrbitControls.js"></script>
+  <!-- Custom script (defer ensures it runs after the above) -->
+  <script defer>
+    // Create scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x222222); // Set a dark background color
+    scene.background = new THREE.Color(0x222222);
 
     // Set up a Perspective Camera
-    const camera = new THREE.PerspectiveCamera(
-      45, // Field of view
-      window.innerWidth / window.innerHeight, // Aspect ratio
-      0.1, // Near clipping plane
-      100 // Far clipping plane
-    );
-    camera.position.set(0, 0, 2); // Set initial camera position
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 2);
 
-    // Create the WebGL renderer and add it to the document
+    // Create the WebGL renderer and attach it to the document body
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    document.addEventListener('DOMContentLoaded', () => {
+      document.body.appendChild(renderer.domElement);
+    });
 
     // Enhanced lighting setup
-
-    // Ambient light for overall illumination
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
     scene.add(ambientLight);
 
-    // Directional light for strong, focused illumination
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(1, 1, 1);
     scene.add(directionalLight);
 
-    // Additional point light to add extra highlights and depth
     const pointLight = new THREE.PointLight(0xffaa00, 0.5, 10);
     pointLight.position.set(-1, -1, 1);
     scene.add(pointLight);
 
     // Set up OrbitControls for mouse interaction
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true; // Enable inertial damping (smoother motion)
-    controls.dampingFactor = 0.05; // Damping factor
-    controls.minDistance = 1; // Minimum zoom distance
-    controls.maxDistance = 5; // Maximum zoom distance
+    // Note: Since renderer.domElement might not be available immediately,
+    // OrbitControls is instantiated inside a timeout to ensure the DOM is ready.
+    // Alternatively, you can place the script at the end of <body>.
+    setTimeout(() => {
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.minDistance = 1;
+      controls.maxDistance = 5;
 
-    // Load the displacement texture (also used as color map here)
-    const textureLoader = new THREE.TextureLoader();
-    const displacementMap = textureLoader.load('carbonfreeze.png');
+      // Load the displacement texture (also used as color map)
+      const textureLoader = new THREE.TextureLoader();
+      const displacementMap = textureLoader.load('carbonfreeze.png');
 
-    // Create plane geometry with sufficient segments for detailed displacement
-    const geometry = new THREE.PlaneGeometry(1, 1, 256, 256);
+      // Create plane geometry with sufficient segments for displacement detail
+      const geometry = new THREE.PlaneGeometry(1, 1, 256, 256);
+      const material = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        map: displacementMap,
+        displacementMap: displacementMap,
+        displacementScale: 0.05,
+        metalness: 0.5,
+        roughness: 0.4
+      });
+      const mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
 
-    // Create a material with displacement mapping and improved shading settings
-    const material = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      map: displacementMap,             // Color texture map
-      displacementMap: displacementMap, // Displacement map for relief effect
-      displacementScale: 0.05,          // Scale of the displacement effect
-      metalness: 0.5,                   // Metalness for reflective quality
-      roughness: 0.4                    // Roughness for surface detail
-    });
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update(); // Update controls for damping effect
+        renderer.render(scene, camera);
+      }
+      animate();
 
-    // Create the mesh and add it to the scene
-    const mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
-
-    // Animation loop to render the scene and update controls
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update(); // Update OrbitControls (for damping)
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    // Adjust the scene on window resize
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+      // Responsive: Update on window resize
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }, 0);
   </script>
+</head>
+<body>
 </body>
 </html>
