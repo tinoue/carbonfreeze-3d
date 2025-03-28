@@ -8,12 +8,14 @@
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
   </style>
-  <!-- Load Three.js with defer so that it's executed in order -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r141/three.min.js"></script>
-  <!-- Load OrbitControls (non-module version) -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r141/examples/js/controls/OrbitControls.js"></script>
-  <!-- Custom script (defer ensures it runs after the above) -->
-  <script defer>
+</head>
+<body>
+  <!-- Load Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r141/three.min.js"></script>
+  <!-- Load OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r141/examples/js/controls/OrbitControls.js"></script>
+  <!-- Custom script -->
+  <script>
     // Create scene
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x222222);
@@ -25,9 +27,7 @@
     // Create the WebGL renderer and attach it to the document body
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.addEventListener('DOMContentLoaded', () => {
-      document.body.appendChild(renderer.domElement);
-    });
+    document.body.appendChild(renderer.domElement);
 
     // Enhanced lighting setup
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
@@ -42,50 +42,43 @@
     scene.add(pointLight);
 
     // Set up OrbitControls for mouse interaction
-    // Note: Since renderer.domElement might not be available immediately,
-    // OrbitControls is instantiated inside a timeout to ensure the DOM is ready.
-    // Alternatively, you can place the script at the end of <body>.
-    setTimeout(() => {
-      const controls = new THREE.OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.05;
-      controls.minDistance = 1;
-      controls.maxDistance = 5;
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.minDistance = 1;
+    controls.maxDistance = 5;
 
-      // Load the displacement texture (also used as color map)
-      const textureLoader = new THREE.TextureLoader();
-      const displacementMap = textureLoader.load('carbonfreeze.png');
+    // Load the displacement texture (also used as color map)
+    const textureLoader = new THREE.TextureLoader();
+    const displacementMap = textureLoader.load('carbonfreeze.png');
 
-      // Create plane geometry with sufficient segments for displacement detail
-      const geometry = new THREE.PlaneGeometry(1, 1, 256, 256);
-      const material = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        map: displacementMap,
-        displacementMap: displacementMap,
-        displacementScale: 0.05,
-        metalness: 0.5,
-        roughness: 0.4
-      });
-      const mesh = new THREE.Mesh(geometry, material);
-      scene.add(mesh);
+    // Create plane geometry with sufficient segments for displacement detail
+    const geometry = new THREE.PlaneGeometry(1, 1, 256, 256);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      map: displacementMap,
+      displacementMap: displacementMap,
+      displacementScale: 0.05,
+      metalness: 0.5,
+      roughness: 0.4
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
 
-      // Animation loop
-      function animate() {
-        requestAnimationFrame(animate);
-        controls.update(); // Update controls for damping effect
-        renderer.render(scene, camera);
-      }
-      animate();
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update(); // Update controls for damping effect
+      renderer.render(scene, camera);
+    }
+    animate();
 
-      // Responsive: Update on window resize
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
-    }, 0);
+    // Responsive: Update on window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
   </script>
-</head>
-<body>
 </body>
 </html>
