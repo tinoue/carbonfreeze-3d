@@ -11,73 +11,76 @@
 </head>
 <body>
   <!-- Load Three.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r141/three.min.js"></script>
-  <!-- Load OrbitControls -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r141/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://unpkg.com/three@0.139.0/build/three.min.js"></script>
+  <!-- Load OrbitControls (non-module version) -->
+  <script src="https://unpkg.com/three@0.139.0/examples/js/controls/OrbitControls.js"></script>
   <!-- Custom script -->
   <script>
-    // Create scene
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x222222);
+    // Wait for the DOM to be fully loaded
+    window.addEventListener('load', () => {
+      // Create scene
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x222222);
 
-    // Set up a Perspective Camera
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 0, 2);
+      // Set up a Perspective Camera
+      const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 0, 2);
 
-    // Create the WebGL renderer and attach it to the document body
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    // Enhanced lighting setup
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
-    scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(1, 1, 1);
-    scene.add(directionalLight);
-
-    const pointLight = new THREE.PointLight(0xffaa00, 0.5, 10);
-    pointLight.position.set(-1, -1, 1);
-    scene.add(pointLight);
-
-    // Set up OrbitControls for mouse interaction
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.minDistance = 1;
-    controls.maxDistance = 5;
-
-    // Load the displacement texture (also used as color map)
-    const textureLoader = new THREE.TextureLoader();
-    const displacementMap = textureLoader.load('carbonfreeze.png');
-
-    // Create plane geometry with sufficient segments for displacement detail
-    const geometry = new THREE.PlaneGeometry(1, 1, 256, 256);
-    const material = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      map: displacementMap,
-      displacementMap: displacementMap,
-      displacementScale: 0.05,
-      metalness: 0.5,
-      roughness: 0.4
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
-
-    // Animation loop
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update(); // Update controls for damping effect
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    // Responsive: Update on window resize
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
+      // Create the WebGL renderer and attach it to the document body
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      // Enhanced lighting setup
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+      scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(1, 1, 1);
+      scene.add(directionalLight);
+
+      const pointLight = new THREE.PointLight(0xffaa00, 0.5, 10);
+      pointLight.position.set(-1, -1, 1);
+      scene.add(pointLight);
+
+      // Set up OrbitControls for mouse interaction
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.minDistance = 1;
+      controls.maxDistance = 5;
+
+      // Load the displacement texture (also used as color map)
+      const textureLoader = new THREE.TextureLoader();
+      const displacementMap = textureLoader.load('carbonfreeze.png');
+
+      // Create plane geometry with sufficient segments for displacement detail
+      const geometry = new THREE.PlaneGeometry(1, 1, 256, 256);
+      const material = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        map: displacementMap,
+        displacementMap: displacementMap,
+        displacementScale: 0.05,
+        metalness: 0.5,
+        roughness: 0.4
+      });
+      const mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
+
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update(); // Update controls for damping effect
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Responsive: Update on window resize
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
     });
   </script>
 </body>
