@@ -8,53 +8,21 @@
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
   </style>
+  <!-- ✅ Three.js を head で読み込む -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r141/three.min.js"></script>
 </head>
 
 <body>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r141/three.min.js"></script>
+  <!-- ✅ Three.js 読み込み後に実行 -->
   <script>
+    // Create scene
     const scene = new THREE.Scene();
+
+    // Create camera
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
     camera.position.z = 2;
 
+    // Create renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(1, 1, 1);
-    scene.add(directionalLight);
-
-    const loader = new THREE.TextureLoader();
-    const displacementMap = loader.load('carbonfreeze.png');
-
-    const geometry = new THREE.PlaneGeometry(1, 1, 256, 256);
-    const material = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      map: displacementMap,
-      displacementMap: displacementMap,
-      displacementScale: 0.05
-    });
-
-    const mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
-
-    function animate() {
-      requestAnimationFrame(animate);
-      mesh.rotation.y += 0.01;
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-  </script>
-</body>
-
-</html>
+    document
