@@ -35,13 +35,18 @@
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
       scene.add(ambientLight);
 
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-      directionalLight.position.set(1, 1, 1);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+      directionalLight.position.set(2, 2, 2);
       scene.add(directionalLight);
 
-      const pointLight = new THREE.PointLight(0xffaa00, 0.5, 10);
-      pointLight.position.set(-1, -1, 1);
+      const pointLight = new THREE.PointLight(0x3366ff, 0.8, 10);
+      pointLight.position.set(-2, -1, 3);
       scene.add(pointLight);
+
+      // Add another point light for enhanced reflections
+      const pointLight2 = new THREE.PointLight(0xffffff, 0.6, 10);
+      pointLight2.position.set(2, -1, 2);
+      scene.add(pointLight2);
 
       // Set up OrbitControls for mouse interaction
       const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -58,14 +63,14 @@
       // Create plane geometry with sufficient segments for detail
       const geometry = new THREE.PlaneGeometry(1, 1, 256, 256);
       const material = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
+        color: 0x111111,
         displacementMap: displacementMap,
         displacementScale: 0.2,
         displacementBias: -0.1,
         bumpMap: bumpMap,
-        bumpScale: 0.02,
-        metalness: 0.5,
-        roughness: 0.4,
+        bumpScale: 0.15,
+        metalness: 0.6,
+        roughness: 0.7,
         side: THREE.DoubleSide
       });
       const mesh = new THREE.Mesh(geometry, material);
