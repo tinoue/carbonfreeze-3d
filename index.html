@@ -24,7 +24,7 @@
 
       // Set up a Perspective Camera
       const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-      camera.position.set(0, 0, 2);
+      camera.position.set(0, 0, 1.5);
 
       // Create the WebGL renderer and attach it to the document body
       const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -36,7 +36,7 @@
       scene.add(ambientLight);
 
       const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-      directionalLight.position.set(0, 1, 1);
+      directionalLight.position.set(0, 0.5, 1);
       scene.add(directionalLight);
 
       const pointLight = new THREE.PointLight(0xffaa00, 0.5, 10);
@@ -60,7 +60,7 @@
         color: 0xffffff,
         map: new THREE.TextureLoader().load('carbonfreeze.png'),
         displacementMap: displacementMap,
-        displacementScale: 0.20,
+        displacementScale: 0.22,
         metalness: 0.5,
         roughness: 0.4
       });
