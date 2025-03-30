@@ -67,12 +67,36 @@
       const mesh = new THREE.Mesh(geometry, material);
       scene.add(mesh);
 
+      // カメラの自動移動のための変数
+      let time = 0;
+      const cameraMovementRadius = 0.1; // 移動の半径
+      const cameraMovementSpeed = 0.001; // 移動の速度
+
       // Animation loop
       function animate() {
         requestAnimationFrame(animate);
-        controls.update(); // Update controls for damping effect
+
+        // マウス操作していない時だけカメラを自動移動
+        if (!controls.enabled) {
+          time += cameraMovementSpeed;
+          camera.position.x = Math.sin(time) * cameraMovementRadius;
+          camera.position.y = Math.cos(time) * cameraMovementRadius * 0.5;
+          camera.lookAt(0, 0, 0);
+        }
+
+        controls.update();
         renderer.render(scene, camera);
       }
+
+      // マウス操作の検知
+      renderer.domElement.addEventListener('mousedown', () => {
+        controls.enabled = true;
+      });
+
+      renderer.domElement.addEventListener('mouseup', () => {
+        controls.enabled = false;
+      });
+
       animate();
 
       // Responsive: Update on window resize
