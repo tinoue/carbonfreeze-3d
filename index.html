@@ -69,35 +69,43 @@
 
       // カメラの自動移動のための変数
       let time = 0;
-      const cameraMovementRadius = 0.1; // 移動の半径
-      const cameraMovementSpeed = 0.001; // 移動の速度
+      const cameraMovementRadius = 0.2; // 移動の半径
+      const cameraMovementSpeed = 0.0025; // 移動の速度
+      let isDragging = false; // マウスドラッグ中かどうかのフラグ
+      const initialCameraPosition = camera.position.clone(); // カメラの初期位置を保存
 
       // Animation loop
       function animate() {
         requestAnimationFrame(animate);
 
-        // マウス操作していない時だけカメラを自動移動
-        if (!controls.enabled) {
+        // マウスドラッグ中でない時だけカメラを自動移動
+        if (!isDragging) {
           time += cameraMovementSpeed;
-          camera.position.x = Math.sin(time) * cameraMovementRadius;
-          camera.position.y = Math.cos(time) * cameraMovementRadius * 0.5;
-          camera.lookAt(0, 0, 0);
+          // 初期位置を基準に円運動させる
+          camera.position.x = initialCameraPosition.x + Math.sin(time) * cameraMovementRadius;
+          camera.position.y = initialCameraPosition.y + Math.cos(time) * cameraMovementRadius * 0.5; // Y方向の揺れは少し抑える
+          // controls.targetも中心に向けることで、OrbitControlsとの競合を防ぐ
+          controls.target.set(0, 0, 0);
         }
 
-        controls.update();
+        controls.update(); // OrbitControlsの状態を更新 ( damping など )
         renderer.render(scene, camera);
       }
 
       // マウス操作の検知
-      renderer.domElement.addEventListener('mousedown', () => {
-        controls.enabled = true;
+      renderer.domElement.addEventListener('pointerdown', () => { // mousedownからpointerdownへ変更 (タッチデバイスも考慮)
+        isDragging = true;
       });
 
-      renderer.domElement.addEventListener('mouseup', () => {
-        controls.enabled = false;
+      // マウスボタンが離された、または画面外に移動した場合
+      renderer.domElement.addEventListener('pointerup', () => {
+        isDragging = false;
+      });
+      renderer.domElement.addEventListener('pointerleave', () => { // マウスがCanvas外に出た場合もドラッグ終了とみなす
+        isDragging = false;
       });
 
-      animate();
+      animate(); // アニメーションループを開始
 
       // Responsive: Update on window resize
       window.addEventListener('resize', () => {
